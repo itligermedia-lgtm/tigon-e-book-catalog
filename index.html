@@ -89,7 +89,7 @@
             display: grid;
             place-items: center;
             overflow: hidden;
-            touch-action: pan-y pinch-zoom;
+            touch-action: none;
             -webkit-user-select: none;
             user-select: none;
         }
@@ -174,14 +174,30 @@
             box-shadow: none !important;
         }
 
-        /* ให้ PageFlip รับท่าปัดแนวนอนบนมือถือ โดยยังคง pinch zoom ได้ */
+        /* ให้หนึ่งนิ้วลากหน้ากระดาษตามนิ้วจริง และใช้สองนิ้วสำหรับ pinch zoom */
+        .page,
         .stf__parent,
         .stf__wrapper,
         .stf__block,
-        .stf__item {
-            touch-action: pan-y pinch-zoom !important;
+        .stf__item,
+        .stf__item > * {
+            touch-action: none !important;
+            -ms-touch-action: none !important;
             -webkit-user-select: none;
             user-select: none;
+            -webkit-touch-callout: none;
+        }
+
+        .stf__parent,
+        .stf__wrapper,
+        .stf__item {
+            cursor: grab;
+        }
+
+        .stf__parent:active,
+        .stf__wrapper:active,
+        .stf__item:active {
+            cursor: grabbing;
         }
 
         .bottom-controls {
@@ -314,7 +330,7 @@
             :root { --control-height: 52px; }
 
             .viewer-stage::after {
-                content: "ปัดซ้ายหรือขวาเพื่อพลิกหน้า";
+                content: "แตะค้างบนหน้า แล้วลากเพื่อพลิก";
                 position: absolute;
                 left: 50%;
                 bottom: 8px;
@@ -407,24 +423,24 @@
         <section class="viewer-stage" id="viewer-stage" aria-label="TIGON Wood Collection">
             <div id="book-wrapper" class="book-wrapper">
                 <div id="book" class="book">
-                    <div class="page"><img fetchpriority="high" decoding="async" src="TIGON_Wood_Collection (1).webp" alt="TIGON Wood Collection หน้า 1"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (2).webp" alt="TIGON Wood Collection หน้า 2"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (3).webp" alt="TIGON Wood Collection หน้า 3"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (4).webp" alt="TIGON Wood Collection หน้า 4"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (5).webp" alt="TIGON Wood Collection หน้า 5"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (6).webp" alt="TIGON Wood Collection หน้า 6"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (7).webp" alt="TIGON Wood Collection หน้า 7"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (8).webp" alt="TIGON Wood Collection หน้า 8"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (9).webp" alt="TIGON Wood Collection หน้า 9"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (10).webp" alt="TIGON Wood Collection หน้า 10"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (11).webp" alt="TIGON Wood Collection หน้า 11"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (12).webp" alt="TIGON Wood Collection หน้า 12"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (13).webp" alt="TIGON Wood Collection หน้า 13"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (14).webp" alt="TIGON Wood Collection หน้า 14"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (15).webp" alt="TIGON Wood Collection หน้า 15"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (16).webp" alt="TIGON Wood Collection หน้า 16"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (17).webp" alt="TIGON Wood Collection หน้า 17"></div>
-                    <div class="page"><img loading="lazy" decoding="async" src="TIGON_Wood_Collection (18).webp" alt="TIGON Wood Collection หน้า 18"></div>
+                    <div class="page"><img fetchpriority="high" decoding="async" src="img/TIGON_Wood_Collection (1).webp" alt="TIGON Wood Collection หน้า 1"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (2).webp" alt="TIGON Wood Collection หน้า 2"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (3).webp" alt="TIGON Wood Collection หน้า 3"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (4).webp" alt="TIGON Wood Collection หน้า 4"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (5).webp" alt="TIGON Wood Collection หน้า 5"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (6).webp" alt="TIGON Wood Collection หน้า 6"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (7).webp" alt="TIGON Wood Collection หน้า 7"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (8).webp" alt="TIGON Wood Collection หน้า 8"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (9).webp" alt="TIGON Wood Collection หน้า 9"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (10).webp" alt="TIGON Wood Collection หน้า 10"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (11).webp" alt="TIGON Wood Collection หน้า 11"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (12).webp" alt="TIGON Wood Collection หน้า 12"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (13).webp" alt="TIGON Wood Collection หน้า 13"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (14).webp" alt="TIGON Wood Collection หน้า 14"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (15).webp" alt="TIGON Wood Collection หน้า 15"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (16).webp" alt="TIGON Wood Collection หน้า 16"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (17).webp" alt="TIGON Wood Collection หน้า 17"></div>
+                    <div class="page"><img loading="lazy" decoding="async" src="img/TIGON_Wood_Collection (18).webp" alt="TIGON Wood Collection หน้า 18"></div>
                 </div>
             </div>
         </section>
@@ -480,6 +496,7 @@
         let pinchStartDistance = 0;
         let pinchStartScale = 1;
         let lastTapTime = 0;
+        let isPinching = false;
         let loadingClosed = false;
 
         const PAGE_WIDTH = 794;
@@ -689,15 +706,15 @@
                     maxHeight: 1132,
                     maxShadowOpacity: 0.45,
                     showCover: true,
-                    mobileScrollSupport: true,
+                    mobileScrollSupport: false,
                     usePortrait: true,
                     autoSize: true,
                     drawShadow: true,
                     flippingTime: 620,
                     clickEventForward: true,
-                    swipeDistance: 18,
+                    swipeDistance: 8,
                     showPageCorners: false,
-                    disableFlipByClick: false
+                    disableFlipByClick: false // แตะค้างและลากหน้ากระดาษได้โดยตรง
                 });
 
                 pageFlip.loadFromHTML(pages);
@@ -785,6 +802,7 @@
 
         viewerStage.addEventListener('touchstart', (event) => {
             if (event.touches.length === 2) {
+                isPinching = true;
                 pinchStartDistance = touchDistance(event.touches);
                 pinchStartScale = currentScale;
                 bookWrapper.style.transition = 'none';
@@ -793,8 +811,9 @@
             }
 
             if (event.touches.length === 1) {
+                isPinching = false;
                 const now = Date.now();
-                if (now - lastTapTime > 0 && now - lastTapTime < 280) {
+                if (now - lastTapTime > 0 && now - lastTapTime < 260) {
                     applyZoom(currentScale > 1 ? 1 : 2);
                     event.preventDefault();
                 }
@@ -809,9 +828,12 @@
             event.preventDefault();
         }, { passive: false });
 
-        const finishTouchGesture = () => {
-            pinchStartDistance = 0;
-            bookWrapper.style.transition = 'transform .28s ease';
+        const finishTouchGesture = (event) => {
+            if (!event.touches || event.touches.length < 2) {
+                pinchStartDistance = 0;
+                isPinching = false;
+                bookWrapper.style.transition = 'transform .28s ease';
+            }
         };
 
         viewerStage.addEventListener('touchend', finishTouchGesture, { passive: true });
