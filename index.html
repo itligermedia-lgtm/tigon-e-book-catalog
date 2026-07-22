@@ -330,7 +330,7 @@
             :root { --control-height: 52px; }
 
             .viewer-stage::after {
-                content: "แตะค้างบนหน้า แล้วลากเพื่อพลิก";
+                content: "ลากหน้ากระดาษประมาณ 1/3 แล้วปล่อยเพื่อพลิก";
                 position: absolute;
                 left: 50%;
                 bottom: 8px;
@@ -498,6 +498,11 @@
         let lastTapTime = 0;
         let isPinching = false;
         let loadingClosed = false;
+
+        // ตัวช่วยการลากบนมือถือ: ปล่อยนิ้วเมื่อเลื่อนประมาณ 34% ก็พลิกหน้าได้
+        const ASSIST_SWIPE_RATIO = 0.34;
+        const ASSIST_SWIPE_MIN_PX = 64;
+        let assistTouch = null;
 
         const PAGE_WIDTH = 794;
         const PAGE_HEIGHT = 561;
@@ -712,7 +717,7 @@
                     drawShadow: true,
                     flippingTime: 620,
                     clickEventForward: true,
-                    swipeDistance: 8,
+                    swipeDistance: 24,
                     showPageCorners: false,
                     disableFlipByClick: false // แตะค้างและลากหน้ากระดาษได้โดยตรง
                 });
@@ -802,6 +807,7 @@
 
         viewerStage.addEventListener('touchstart', (event) => {
             if (event.touches.length === 2) {
+                assistTouch = null;
                 isPinching = true;
                 pinchStartDistance = touchDistance(event.touches);
                 pinchStartScale = currentScale;
@@ -812,8 +818,21 @@
 
             if (event.touches.length === 1) {
                 isPinching = false;
+                const touch = event.touches[0];
+                const startedOnBook = Boolean(event.target.closest('.stf__parent, .stf__wrapper, .stf__item, .page, #book'));
+
+                assistTouch = startedOnBook && currentScale <= 1.01 && pageFlip ? {
+                    startX: touch.clientX,
+                    startY: touch.clientY,
+                    lastX: touch.clientX,
+                    lastY: touch.clientY,
+                    startedAt: performance.now(),
+                    pageIndex: pageFlip.getCurrentPageIndex()
+                } : null;
+
                 const now = Date.now();
                 if (now - lastTapTime > 0 && now - lastTapTime < 260) {
+                    assistTouch = null;
                     applyZoom(currentScale > 1 ? 1 : 2);
                     event.preventDefault();
                 }
@@ -822,19 +841,51 @@
         }, { passive: false });
 
         viewerStage.addEventListener('touchmove', (event) => {
-            if (event.touches.length !== 2 || !pinchStartDistance) return;
-            const ratio = touchDistance(event.touches) / pinchStartDistance;
-            applyZoom(pinchStartScale * ratio, false);
-            event.preventDefault();
+            if (event.touches.length === 2 && pinchStartDistance) {
+                assistTouch = null;
+                const ratio = touchDistance(event.touches) / pinchStartDistance;
+                applyZoom(pinchStartScale * ratio, false);
+                event.preventDefault();
+                return;
+            }
+
+            if (event.touches.length === 1 && assistTouch) {
+                assistTouch.lastX = event.touches[0].clientX;
+                assistTouch.lastY = event.touches[0].clientY;
+            }
         }, { passive: false });
 
-        const finishTouchGesture = (event) => {
+        function finishTouchGesture(event) {
+            const completedTouch = assistTouch;
+            assistTouch = null;
+
             if (!event.touches || event.touches.length < 2) {
                 pinchStartDistance = 0;
                 isPinching = false;
                 bookWrapper.style.transition = 'transform .28s ease';
             }
-        };
+
+            if (!completedTouch || !pageFlip || currentScale > 1.01 || event.type === 'touchcancel') return;
+
+            const changedX = completedTouch.lastX - completedTouch.startX;
+            const changedY = completedTouch.lastY - completedTouch.startY;
+            const horizontalDistance = Math.abs(changedX);
+            const duration = performance.now() - completedTouch.startedAt;
+            const visiblePageWidth = Math.max(1, bookWrapper.getBoundingClientRect().width / (pageFlip.getOrientation() === 'landscape' ? 2 : 1));
+            const requiredDistance = Math.max(ASSIST_SWIPE_MIN_PX, visiblePageWidth * ASSIST_SWIPE_RATIO);
+            const isHorizontal = horizontalDistance > Math.abs(changedY) * 1.15;
+            const isIntentional = horizontalDistance >= requiredDistance && duration <= 1600 && isHorizontal;
+
+            if (!isIntentional) return;
+
+            // รอให้ PageFlip จบการประมวลผล gesture เดิมก่อน เพื่อป้องกันการพลิกซ้ำ
+            window.setTimeout(() => {
+                if (!pageFlip || isFlipping) return;
+                if (pageFlip.getCurrentPageIndex() !== completedTouch.pageIndex) return;
+                if (changedX < 0) goNext();
+                else goPrevious();
+            }, 55);
+        }
 
         viewerStage.addEventListener('touchend', finishTouchGesture, { passive: true });
         viewerStage.addEventListener('touchcancel', finishTouchGesture, { passive: true });
